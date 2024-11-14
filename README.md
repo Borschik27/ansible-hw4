@@ -1,1 +1,102 @@
-# ansible-hw4
+Данное дз сделано на основе прошлого использовался терраформ для создания виртуалок.
+Файл hosts собирается автоматически
+Переделан playbook "svc.yml" на "playbook_roles.yaml" c использование roles
+
+Вывод команды "ansible-playbook playbooks/playbook_roles.yaml"
+```
+PLAY [Install ClickHouse] ********************************************************************************************************************************
+
+TASK [Gathering Facts] ***********************************************************************************************************************************
+ok: [clickhouse]
+
+TASK [clickhouse-role : Download and add Clickhouse GPG key] *********************************************************************************************
+changed: [clickhouse]
+
+TASK [clickhouse-role : Add Clickhouse repository] *******************************************************************************************************
+changed: [clickhouse]
+
+TASK [clickhouse-role : Update apt cache] ****************************************************************************************************************
+ok: [clickhouse]
+
+TASK [clickhouse-role : Install ClickHouse packages] *****************************************************************************************************
+changed: [clickhouse]
+
+TASK [clickhouse-role : Create ClickHouse database] ******************************************************************************************************
+FAILED - RETRYING: [clickhouse]: Create ClickHouse database (10 retries left).
+FAILED - RETRYING: [clickhouse]: Create ClickHouse database (9 retries left).
+changed: [clickhouse]
+
+RUNNING HANDLER [clickhouse-role : Start clickhouse service] *********************************************************************************************
+changed: [clickhouse]
+
+PLAY [Install Vector] ************************************************************************************************************************************
+
+TASK [Gathering Facts] ***********************************************************************************************************************************
+ok: [vector]
+
+TASK [vector-role : Download Vector deb package] *********************************************************************************************************
+changed: [vector]
+
+TASK [vector-role : Install Vector] **********************************************************************************************************************
+changed: [vector]
+
+TASK [vector-role : Deploy Vector configuration] *********************************************************************************************************
+changed: [vector]
+
+RUNNING HANDLER [vector-role : Restart Vector] ***********************************************************************************************************
+changed: [vector]
+
+PLAY [Install LightHouse] ********************************************************************************************************************************
+
+TASK [Gathering Facts] ***********************************************************************************************************************************
+ok: [lighthouse]
+
+TASK [lihghouse-role : Install dependencies] *************************************************************************************************************
+changed: [lighthouse]
+
+TASK [lihghouse-role : Clone the Lighthouse repository] **************************************************************************************************
+changed: [lighthouse]
+
+PLAY RECAP ***********************************************************************************************************************************************
+clickhouse                 : ok=7    changed=5    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+lighthouse                 : ok=3    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+vector                     : ok=5    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+
+# Описание ролей
+
+# Vector Role
+
+Ansible role for installing and configuring [Vector](https://vector.dev/), a high-performance observability data pipeline.
+
+## Requirements
+
+- Ansible 2.9 or higher
+- Ubuntu/Debian based OS (other systems may require modifications)
+- `vector` package repository is set up.
+
+## Role Variables
+
+| Variable                | Default                 | Description                                                                 |
+|-------------------------|-------------------------|-----------------------------------------------------------------------------|
+| `vector_version`         | `0.25.0`                | The version of Vector to be installed.                                      |
+| `vector_config_file`     | `/etc/vector/vector.toml`| Path to the Vector configuration file.                                      |
+| `vector_config_template` | `vector_config.j2`      | The Jinja2 template file for configuring Vector.                            |
+| `vector_install_source`  | `https://packages.timber.io`| The source repository to fetch the Vector package from.                    |
+
+## Dependencies
+
+None.
+
+## Example Playbook
+
+```yaml
+- hosts: vector
+  become: true
+  roles:
+    - vector-role
+```
+
+
+### 2. `README.md` для **Lighhouse** роли
+
