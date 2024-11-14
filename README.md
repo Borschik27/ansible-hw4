@@ -82,7 +82,7 @@ Ansible role for installing and configuring [Vector](https://vector.dev/), a hig
 | `vector_version`         | `0.42.0`                | The version of Vector to be installed.                                      |
 | `vector_config_file`     | `/etc/vector/vector.yaml`| Path to the Vector configuration file.                                      |
 | `vector_config_template` | `vector_config.j2`      | The Jinja2 template file for configuring Vector.                            |
-| `vector_install_source`  | `[https://github.com/vectordotdev/vector]`| The source repository to fetch the Vector package from.                    |
+| `vector_install_source`  | `https://github.com/vectordotdev/vector`| The source repository to fetch the Vector package from.                    |
 
 ## Dependencies
 
@@ -100,7 +100,7 @@ None.
 ## Использование
 Клонируйте этот репозиторий и перейдите в директорию роли.
 Включите роль vector-role в ваш плейбук.
-При необходимости измените переменные vector_config_file и vector_version в вашем плейбуке или в файле group_vars/vector.
+При необходимости измените переменные vector_config_file и vector_version в вашем плейбуке или в файле roles/vector-role/defaults/main.yml.
 Запустите плейбук.
 
 ## Задачи
@@ -117,3 +117,41 @@ None.
 
 ### 2. `README.md` для **Lighhouse** роли
 
+# Lighthouse Role
+
+Ansible role for installing and configuring [Lighthouse](https://github.com/VKCOM/lighthouse.git), an open-source observability and monitoring tool.
+
+## Requirements
+
+- Ansible 2.9 or higher
+
+## Role Variables
+
+| Variable                | Default                   | Description                                                                  |
+|-------------------------|---------------------------|------------------------------------------------------------------------------|
+| `lighthouse_repo_url` | `https://github.com/VKCOM/lighthouse.git` | The source repository to fetch the Lighthouse package from.                   |
+
+## Dependencies
+
+None.
+
+## Example Playbook
+
+```yaml
+- hosts: lighhouse
+  become: true
+  roles:
+    - lighhouse-role
+```
+
+## Использование
+Клонируйте этот репозиторий и перейдите в директорию роли.
+Включите роль lighthouse-role в ваш плейбук.
+При необходимости измените переменные lighthouse_install_path в вашем плейбуке или в файле roles/lighhouse-role/defaults/main.yml.
+Запустите плейбук.
+
+## Задачи
+Эта роль выполняет следующие задачи:
+
+Устанавливает Lighthouse из указанного репозитория пакетов.
+Запустите index.html bp rfnfkjuf ecnfyjdrb
