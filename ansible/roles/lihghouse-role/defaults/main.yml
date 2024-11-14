@@ -1,0 +1,6 @@
+---
+# defaults file for lighthouse_role
+lighthouse_install_path: "/opt/lighthouse"
+lighthouse_repo_url: "https://github.com/VKCOM/lighthouse.git"
+lighthouse_repo_version: "master"
+

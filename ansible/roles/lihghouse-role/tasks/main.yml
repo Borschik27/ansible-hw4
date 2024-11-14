@@ -1,0 +1,15 @@
+---
+# tasks file for lighthouse_role
+
+- name: Install dependencies
+  ansible.builtin.apt:
+    name: "{{ dependencies }}"
+    update_cache: yes
+  tags: [install]
+
+- name: Clone the Lighthouse repository
+  ansible.builtin.git:
+    repo: "{{ lighthouse_repo_url }}"
+    dest: "{{ lighthouse_install_path }}"
+    version: "{{ lighthouse_repo_version }}"
+  tags: [install]

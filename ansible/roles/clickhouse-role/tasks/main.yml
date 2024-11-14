@@ -1,0 +1,37 @@
+---
+- name: Download and add Clickhouse GPG key
+  ansible.builtin.shell: |
+    curl -fsSL '{{ clickhouse_gpg_key_url }}' | gpg --dearmor -o '{{ clickhouse_keyring_path }}'
+  args:
+    creates: '{{ clickhouse_keyring_path }}'
+  become: true
+
+- name: Add Clickhouse repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by={{ clickhouse_keyring_path }}] {{ clickhouse_repo_url }} stable main"
+    filename: "{{ clickhouse_repo_filename }}"
+  become: true
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+  become: true
+
+- name: Install ClickHouse packages
+  ansible.builtin.apt:
+    name: "{{ clickhouse_packages }}"
+    state: present
+  notify: Start clickhouse service
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Create ClickHouse database
+  ansible.builtin.command: "clickhouse-client -q 'CREATE DATABASE IF NOT EXISTS {{ clickhouse_database_name }};'"
+  register: create_db
+  failed_when: create_db.rc != 0 and create_db.rc != 82
+  changed_when: create_db.rc == 0
+  retries: 10
+  delay: 30
+  until: create_db is succeeded
+

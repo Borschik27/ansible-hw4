@@ -1,0 +1,4 @@
+---
+# vars file for vector-role
+vector_package: "vector_{{ vector_version }}-1_amd64.deb"
+vector_url: "https://github.com/vectordotdev/vector/releases/download/v{{ vector_version }}/{{ vector_package }}"

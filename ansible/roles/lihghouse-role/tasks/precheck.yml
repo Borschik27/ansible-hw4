@@ -1,0 +1,8 @@
+---
+# tasks to check requirements for lighthouse_role
+
+- name: "Requirements check | Ensuring dependencies are available"
+  ansible.builtin.package_facts:
+    manager: auto
+  tags: [precheck]
+

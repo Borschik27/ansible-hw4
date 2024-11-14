@@ -1,0 +1,7 @@
+---
+# defaults file for vector-role
+vector_version: "{{ lookup('pipe', 'curl -s https://api.github.com/repos/vectordotdev/vector/releases/latest | jq -r .tag_name | sed s/^v//') }}"
+vector_install_path: "/etc/vector"
+vector_config_file: "vector.yaml"
+vector_temp_path: "/tmp/"
+vector_service_name: "vector"

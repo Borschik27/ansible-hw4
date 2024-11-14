@@ -1,0 +1,7 @@
+---
+# vars file for lighthouse_role
+dependencies:
+  - git
+  - w3m
+  - curl
+  - wget

@@ -1,0 +1,22 @@
+---
+# main tasks file for vector_role
+
+- name: Download Vector deb package
+  ansible.builtin.get_url:
+    url: "{{ vector_url }}"
+    dest: "{{ vector_temp_path }}{{ vector_package }}"
+  tags: [install]
+
+- name: Install Vector
+  ansible.builtin.apt:
+    deb: "{{ vector_temp_path }}{{ vector_package }}"
+    state: present
+  tags: [install]
+
+- name: Deploy Vector configuration
+  ansible.builtin.template:
+    src: "vector_config.j2"
+    dest: "{{ vector_install_path }}/{{ vector_config_file }}"
+  notify: Restart Vector
+  tags: [config]
+

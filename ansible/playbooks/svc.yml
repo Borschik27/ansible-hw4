@@ -1,0 +1,101 @@
+---
+- name: Install Clickhouse
+  hosts: clickhouse
+  become: true
+  handlers:
+    - name: Start clickhouse service
+      become: true
+      ansible.builtin.service:
+        name: clickhouse-server
+        state: restarted
+
+  vars_files:
+    - ../group_vars/clickhouse/vars.yml
+  tasks:
+    - name: Download and add Clickhouse GPG key
+      ansible.builtin.shell: |
+        curl -fsSL 'https://packages.clickhouse.com/rpm/lts/repodata/repomd.xml.key' | gpg --dearmor -o /usr/share/keyrings/clickhouse-keyring.gpg
+      args:
+        creates: /usr/share/keyrings/clickhouse-keyring.gpg
+      become: true
+
+    - name: Add Clickhouse repository
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/clickhouse-keyring.gpg] https://packages.clickhouse.com/deb stable main"
+        filename: "clickhouse"
+      become: true
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+      become: true
+
+    - name: Install clickhouse packages
+      become: true
+      ansible.builtin.apt:
+        name: "{{ clickhouse_packages }}"
+        state: present
+      notify: Start clickhouse service
+
+    - name: Flush handlers
+      meta: flush_handlers
+
+    - name: Create database
+      ansible.builtin.command: "clickhouse-client -q 'create database logs;'"
+      register: create_db
+      failed_when: create_db.rc != 0 and create_db.rc != 82
+      changed_when: create_db.rc == 0
+      retries: 5
+      delay: 10
+      until: create_db is succeeded
+
+- name: Install Vector
+  hosts: vector
+  become: true
+  vars:
+    vector_version: "0.42.0"
+    vector_package: "vector_{{ vector_version }}-1_amd64.deb"
+    vector_url: "https://github.com/vectordotdev/vector/releases/download/v{{ vector_version }}/{{ vector_package }}"
+    vector_install_path: "/etc/vector"
+    
+  handlers:
+    - name: Restart Vector
+      ansible.builtin.systemd:
+        name: vector
+        state: restarted
+
+  tasks:
+    - name: Download Vector deb package
+      ansible.builtin.get_url:
+        url: "{{ vector_url }}"
+        dest: "/tmp/{{ vector_package }}"
+
+    - name: Install Vector
+      ansible.builtin.apt:
+        deb: "/tmp/{{ vector_package }}"
+        state: present
+
+    - name: Deploy Vector configuration
+      ansible.builtin.template:
+        src: ../group_vars/vector/vector_config.j2
+        dest: "{{ vector_install_path }}/vector.yaml"
+      notify: Restart Vector
+
+- name: Install LighHouse
+  hosts: lighthouse
+  become: true
+
+  tasks:
+    - name: Install dependencies
+      ansible.builtin.apt:
+        name: 
+          - git
+          - w3m
+        update_cache: yes
+      become: true
+
+    - name: Clone the lighthouse repository
+      git:
+        repo: 'https://github.com/VKCOM/lighthouse.git'
+        dest: '/opt/lighthouse'
+        version: master
